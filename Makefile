@@ -1,12 +1,13 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -g
+CXXFLAGS = -Wall -Wextra -g -Wno-comment
 HEADRS = $(wildcard *.hpp)	
 
-EXE = Demo
+demo = Demo
+EXE = tree
 
 all: $(EXE)
 
-$(EXE): $(EXE).cpp $(HEADRS)
+$(EXE): $(demo).cpp $(HEADRS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
