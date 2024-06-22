@@ -29,31 +29,47 @@ public:
         parent.add_child(child);
     }
 
-        PreOrderIterator<T> begin_pre_order()
+    PreOrderIterator<T> begin_pre_order()
+    {
+        if (k_ary == 2)
         {
-            if (k_ary == 2)
-            {
-    #ifdef DEBUG
-                std::cout << "Creating a new iterator with the root" << std::endl;
-    #endif
-                return PreOrderIterator<T>(root);
-            }
-
-            throw std::runtime_error("Error: Can pre-order traverse only on 2-ary trees");
+#ifdef DEBUG
+            std::cout << "Creating a new iterator with the root" << std::endl;
+#endif
+            return PreOrderIterator<T>(root);
         }
 
-        PreOrderIterator<T> end_pre_order()
-        {
-            if (k_ary == 2)
-            {
-    #ifdef DEBUG
-                std::cout << "Creating a new iterator with nullptr" << std::endl;
-    #endif
-                return PreOrderIterator<T>(nullptr);
-            }
+        throw std::runtime_error("Error: Can pre-order traverse only on 2-ary trees");
+    }
 
-            throw std::runtime_error("Error: Can pre-order traverse only on 2-ary trees");
+    PreOrderIterator<T> end_pre_order()
+    {
+        if (k_ary == 2)
+        {
+#ifdef DEBUG
+            std::cout << "Creating a new iterator with nullptr" << std::endl;
+#endif
+            return PreOrderIterator<T>(nullptr);
         }
+
+        throw std::runtime_error("Error: Can pre-order traverse only on 2-ary trees");
+    }
+
+    PostOrderIterator<T> begin_post_order()
+    {
+        if (k_ary == 2)
+            return PostOrderIterator<T>(root);
+
+        throw std::runtime_error("Error: Can pre-order traverse only on 2-ary trees");
+    }
+
+    PostOrderIterator<T> end_post_order()
+    {
+        if (k_ary == 2)
+            return PostOrderIterator<T>(nullptr);
+            
+        throw std::runtime_error("Error: Can pre-order traverse only on 2-ary trees");
+    }
 
     BFSIterator<T> begin_bfs_scan()
     {

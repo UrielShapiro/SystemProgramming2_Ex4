@@ -5,42 +5,51 @@
 
 // #define DEBUG
 
+#define LEFT_CHILD 0
+#define RIGHT_CHILD 1
+
 using std::stack, std::queue;
 
 template <typename T>
-class PreOrderIterator
+class Iterator
+{
+protected:
+    Node<T> *p_current;
+
+public:
+    Iterator(Node<T> *root) : p_current(root) {}
+    virtual ~Iterator() = default;
+    virtual Iterator<T> *operator++() = 0;
+    virtual const T &get_value() const
+    {
+        if (this->p_current != nullptr)
+            return this->p_current->get_data();
+        else
+            throw std::runtime_error("ERROR in get_value");
+    }
+
+    virtual Node<T> *get_current() const
+    {
+        return this->p_current;
+    }
+
+    virtual bool operator!=(const Iterator<T> &other) const
+    {
+        return this->p_current != other.get_current();
+    }
+};
+
+template <typename T>
+class PreOrderIterator : public Iterator<T>
 {
 private:
-    Node<T> *p_current;
     stack<Node<T> *> pre_order_stack;
 
 public:
-    PreOrderIterator(Node<T> *root) : p_current(root)
+    PreOrderIterator(Node<T> *root) : Iterator<T>(root)
     {
         if (root != nullptr)
             pre_order_stack.push(root);
-
-#ifdef DEBUG
-        std::cout << "stack size on constructor: " << pre_order_stack.size() << std::endl;
-#endif
-    }
-
-    ~PreOrderIterator() = default;
-
-    Node<T> *get_current() const
-    {
-        return p_current;
-    }
-
-    const T &get_value() const
-    {
-#ifdef DEBUG
-        std::cout << "Reached get_value: stack size: " << pre_order_stack.size() << std::endl;
-#endif
-        if (p_current != nullptr)
-            return p_current->get_data();
-        else
-            throw std::runtime_error("ERROR in get_value");
     }
 
     PreOrderIterator<T> *operator++()
@@ -80,65 +89,98 @@ public:
 #ifdef DEBUG
             std::cout << "Assigning the top, which is: " << pre_order_stack.top()->get_data() << std::endl;
 #endif
-            p_current = pre_order_stack.top();
+            this->p_current = pre_order_stack.top();
         }
         else
         {
 #ifdef DEBUG
             std::cout << "Assigning nullptr" << std::endl;
 #endif
-            p_current = nullptr;
+            this->p_current = nullptr;
         }
 #ifdef DEBUG
         std::cout << "Done here" << std::endl;
 #endif
         return this;
     }
+};
 
-    bool operator!=(const PreOrderIterator<T> &other) const
+template <typename T>
+class PostOrderIterator : public Iterator<T>
+{
+private:
+    stack<Node<T> *> parents_stack;
+    queue<Node<T> *> children_queue;
+
+    void addSubTree(Node<T> *sub_root)
     {
-#ifdef DEBUG
-        std::cout << "Using !=" << std::endl;
-#endif
-        return this->p_current != other.get_current();
+        if (sub_root->is_leaf())
+            return;
+
+        Node<T> *r_node;
+        if (sub_root->get_children().size() > 1)
+        {
+            r_node = sub_root->get_children()[RIGHT_CHILD];
+            parents_stack.push(r_node);
+        }
+
+        Node<T> *l_node = sub_root->get_children()[LEFT_CHILD];
+        parents_stack.push(l_node);
+        if (sub_root->get_children().size() > 1)
+            addSubTree(r_node);
+
+        addSubTree(l_node);
+    }
+
+public:
+    PostOrderIterator(Node<T> *root) : Iterator<T>(root)
+    {
+        addSubTree(root->get_children()[RIGHT_CHILD]);
+        parents_stack.push(root);
+        addSubTree(root->get_children()[LEFT_CHILD]);
+        
+        children_queue.push(parents_stack.top()->get_children()[RIGHT_CHILD]);
+        children_queue.push(parents_stack.top()->get_children()[LEFT_CHILD]);
+        this->p_current = children_queue.front();
+        children_queue.pop();
+    }
+
+    PostOrderIterator<T> *operator++()
+    {
+        if (children_queue.empty() && parents_stack.empty())
+        {
+            this->p_current = nullptr;
+            return this;
+        }
+        if (!children_queue.empty())
+        {
+            this->p_current = children_queue.front();
+            children_queue.pop();
+            return this;
+        }
+        if (!parents_stack.empty())
+        {
+            this->p_current = parents_stack.top();
+            parents_stack.pop();
+            children_queue.push(parents_stack.top()->get_children()[LEFT_CHILD]);
+            children_queue.push(parents_stack.top()->get_children()[RIGHT_CHILD]);
+        }
+
+        return this;
     }
 };
 
 template <typename T>
-class PostOrderIterator
-{
-};
-
-template <typename T>
-class BFSIterator
+class BFSIterator : public Iterator<T>
 {
 private:
     queue<Node<T> *> _queue;
-    Node<T> *p_current;
 
 public:
-    BFSIterator(Node<T> *root) : p_current(root)
+    BFSIterator(Node<T> *root) : Iterator<T>(root)
     {
         if (root != nullptr)
             _queue.push(root);
-    }
-
-    ~BFSIterator() = default;
-
-    Node<T> *get_current() const
-    {
-        return p_current;
-    }
-
-    const T &get_value() const
-    {
-#ifdef DEBUG
-        std::cout << "Reached get_value: stack size: " << _queue.size() << std::endl;
-#endif
-        if (p_current != nullptr)
-            return p_current->get_data();
-        else
-            throw std::runtime_error("ERROR in get_value");
     }
 
     BFSIterator<T> *operator++()
@@ -165,19 +207,11 @@ public:
         }
         else
         {
-            p_current = nullptr;
+            this->p_current = nullptr;
             return this;
         }
 
-        p_current = _queue.front();
+        this->p_current = _queue.front();
         return this;
-    }
-
-    bool operator!=(const BFSIterator<T> &other) const
-    {
-#ifdef DEBUG
-        std::cout << "Using !=" << std::endl;
-#endif
-        return this->p_current != other.get_current();
     }
 };
