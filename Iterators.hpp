@@ -22,6 +22,9 @@ public:
     virtual Iterator<T> *operator++() = 0;
     virtual const T &get_value() const
     {
+#ifdef DEBUG
+        std::cout << "Using get_value" << std::endl;
+#endif
         if (this->p_current != nullptr)
             return this->p_current->get_data();
         else
@@ -110,23 +113,26 @@ class PostOrderIterator : public Iterator<T>
 {
 private:
     stack<Node<T> *> parents_stack;
-    queue<Node<T> *> children_queue;
 
     void addSubTree(Node<T> *sub_root)
     {
-        if (sub_root->is_leaf())
+#ifdef DEBUG
+        std::cout << "Adding the subtree of: " << sub_root->get_data() << std::endl;
+#endif
+        if (sub_root == nullptr || sub_root->is_leaf()) // If is leaf, was already been added on previous iteration
             return;
 
-        Node<T> *r_node;
+        Node<T> *r_node = nullptr;
         if (sub_root->get_children().size() > 1)
         {
             r_node = sub_root->get_children()[RIGHT_CHILD];
-            parents_stack.push(r_node);
+            this->parents_stack.push(r_node);
         }
 
-        Node<T> *l_node = sub_root->get_children()[LEFT_CHILD];
-        parents_stack.push(l_node);
-        if (sub_root->get_children().size() > 1)
+        Node<T> *l_node = sub_root->get_children()[LEFT_CHILD]; // Must have a left child because is not a leaf
+        this->parents_stack.push(l_node);
+
+        if (r_node != nullptr)
             addSubTree(r_node);
 
         addSubTree(l_node);
@@ -135,39 +141,56 @@ private:
 public:
     PostOrderIterator(Node<T> *root) : Iterator<T>(root)
     {
-        addSubTree(root->get_children()[RIGHT_CHILD]);
-        parents_stack.push(root);
-        addSubTree(root->get_children()[LEFT_CHILD]);
-        
-        children_queue.push(parents_stack.top()->get_children()[RIGHT_CHILD]);
-        children_queue.push(parents_stack.top()->get_children()[LEFT_CHILD]);
-        this->p_current = children_queue.front();
-        children_queue.pop();
+#ifdef DEBUG
+        if (root == nullptr)
+            std::cout << "Root is nullptr" << std::endl;
+#endif
+        if (root != nullptr)
+        {
+            this->parents_stack.push(root); // Root must be printed at the end, therefore is pushed first
+
+            if (root->get_children().size() > 1)
+            {
+                this->parents_stack.push(root->get_children()[RIGHT_CHILD]);
+                addSubTree(root->get_children()[RIGHT_CHILD]);
+            }
+
+            if (!root->is_leaf())
+            {
+                this->parents_stack.push(root->get_children()[LEFT_CHILD]);
+                addSubTree(root->get_children()[LEFT_CHILD]);
+            }
+
+            this->p_current = this->parents_stack.top();    // Setting the pointer to the top of the stack (which is the leftmost leaf)
+            this->parents_stack.pop();
+        }
     }
 
     PostOrderIterator<T> *operator++()
     {
-        if (children_queue.empty() && parents_stack.empty())
+        if (parents_stack.empty())  // Means that all nodes reached, can finish.
         {
-            this->p_current = nullptr;
+            this->p_current = nullptr; 
+#ifdef DEBUG
+            std::cout << "Parent stack is empty" << std::endl;
+#endif
             return this;
         }
-        if (!children_queue.empty())
-        {
-            this->p_current = children_queue.front();
-            children_queue.pop();
-            return this;
-        }
+
         if (!parents_stack.empty())
         {
             this->p_current = parents_stack.top();
             parents_stack.pop();
-            children_queue.push(parents_stack.top()->get_children()[LEFT_CHILD]);
-            children_queue.push(parents_stack.top()->get_children()[RIGHT_CHILD]);
         }
 
         return this;
     }
+};
+
+template <typename T>
+class InOrderIterator : public Iterator<T>
+{
+
 };
 
 template <typename T>
