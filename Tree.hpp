@@ -4,7 +4,8 @@
 #include "Node.hpp"
 #include "Iterators.hpp"
 
-// #define DEBUG
+//  #define DEBUG
+ #define ERROR_MESSEGE "Error: Can pre-order traverse only on 2-ary trees"
 
 template <typename T, int K = 2>
 class Tree
@@ -34,12 +35,12 @@ public:
         if (k_ary == 2)
         {
 #ifdef DEBUG
-            std::cout << "Creating a new iterator with the root" << std::endl;
+            std::cout << "Creating a new PreOrderIterator with the root" << std::endl;
 #endif
             return PreOrderIterator<T>(root);
         }
 
-        throw std::runtime_error("Error: Can pre-order traverse only on 2-ary trees");
+        throw std::runtime_error(ERROR_MESSEGE);
     }
 
     PreOrderIterator<T> end_pre_order()
@@ -47,28 +48,38 @@ public:
         if (k_ary == 2)
         {
 #ifdef DEBUG
-            std::cout << "Creating a new iterator with nullptr" << std::endl;
+            std::cout << "Creating a new PreOrderIterator with nullptr" << std::endl;
 #endif
             return PreOrderIterator<T>(nullptr);
         }
 
-        throw std::runtime_error("Error: Can pre-order traverse only on 2-ary trees");
+        throw std::runtime_error(ERROR_MESSEGE);
     }
 
     PostOrderIterator<T> begin_post_order()
     {
         if (k_ary == 2)
+        {
+#ifdef DEBUG
+            std::cout << "Creating a new PostOrderIterator with the root" << std::endl;
+#endif
             return PostOrderIterator<T>(root);
+        }
 
-        throw std::runtime_error("Error: Can pre-order traverse only on 2-ary trees");
+        throw std::runtime_error(ERROR_MESSEGE);
     }
 
     PostOrderIterator<T> end_post_order()
     {
         if (k_ary == 2)
+        {
+#ifdef DEBUG
+            std::cout << "Creating a new PostOrderIterator with nullptr" << std::endl;
+#endif
             return PostOrderIterator<T>(nullptr);
-            
-        throw std::runtime_error("Error: Can pre-order traverse only on 2-ary trees");
+        }
+
+        throw std::runtime_error(ERROR_MESSEGE);
     }
 
     BFSIterator<T> begin_bfs_scan()
