@@ -41,4 +41,20 @@ public:
     {
         return this->children.empty();
     }
+
+    bool operator<(const Node<T> &other) const
+    {
+        return this->data() < other.get_data();
+    }
+
+    bool operator>(const Node<T> &other) const
+    {
+        return this->data() > other.get_data();
+    }
+
+    bool operator==(const Node<T> &other) const
+    {
+        return this->data == other.get_data();
+    }
+
 };
