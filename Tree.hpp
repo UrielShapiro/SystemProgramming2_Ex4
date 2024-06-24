@@ -5,7 +5,7 @@
 #include "Iterators.hpp"
 
 //  #define DEBUG
- #define ERROR_MESSEGE "Error: Can pre-order traverse only on 2-ary trees"
+#define ERROR_MESSEGE "Error: Can pre-order traverse only on 2-ary trees"
 
 template <typename T, int K = 2>
 class Tree
@@ -82,6 +82,32 @@ public:
         throw std::runtime_error(ERROR_MESSEGE);
     }
 
+    InOrderIterator<T> begin_in_order()
+    {
+        if (k_ary == 2)
+        {
+#ifdef DEBUG
+            std::cout << "Creating a new PostOrderIterator with nullptr" << std::endl;
+#endif
+            return InOrderIterator<T>(root);
+        }
+
+        throw std::runtime_error(ERROR_MESSEGE);
+    }
+
+    InOrderIterator<T> end_in_order()
+    {
+        if (k_ary == 2)
+        {
+#ifdef DEBUG
+            std::cout << "Creating a new PostOrderIterator with nullptr" << std::endl;
+#endif
+            return InOrderIterator<T>(nullptr);
+        }
+
+        throw std::runtime_error(ERROR_MESSEGE);
+    }
+
     BFSIterator<T> begin_bfs_scan()
     {
         return BFSIterator<T>(root);
@@ -90,5 +116,25 @@ public:
     BFSIterator<T> end_bfs_scan()
     {
         return BFSIterator<T>(nullptr);
+    }
+
+    DFSIterator<T> begin_dfs_scan()
+    {
+        return DFSIterator<T>(root);
+    }
+
+    DFSIterator<T> end_dfs_scan()
+    {
+        return DFSIterator<T>(nullptr);
+    }
+
+    MinHeap<T> begin_min_heap_scan()
+    {
+        return MinHeap<T>(root);
+    }
+
+    MinHeap<T> end_min_heap_scan()
+    {
+        return MinHeap<T>(nullptr);
     }
 };
