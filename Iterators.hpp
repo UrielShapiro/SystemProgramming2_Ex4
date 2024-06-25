@@ -517,12 +517,6 @@ private:
         return node1->get_data() > node2->get_data();
     }
 
-    // void add_to_heap(Node<T> *node)
-    // {
-    //     this->min_heap.push_back(node);
-    //     std::push_heap(this->min_heap.begin(), this->min_heap.end(), compare_nodes); // Restore the heap property
-    // };
-
     void addSubTree(Node<T> *sub_root)
     {
 #ifdef DEBUG
