@@ -2,24 +2,27 @@
 #include "Node.hpp"
 #include <stack>
 #include <queue>
+#include <algorithm>
 
 // #define DEBUG
 
 #define LEFT_CHILD 0
 #define RIGHT_CHILD 1
+#define BINARY_TREE 2
 
 using std::stack, std::queue, std::priority_queue;
 
-template <typename T>
+template <typename T, int K = 2>
 class Iterator
 {
 protected:
     Node<T> *p_current;
+    bool not_binary;
 
 public:
-    Iterator(Node<T> *root) : p_current(root) {}
+    Iterator(Node<T> *root) : p_current(root), not_binary(K > 2) {}
     virtual ~Iterator() = default;
-    virtual Iterator<T> *operator++() = 0;
+    virtual Iterator<T, K> *operator++() = 0;
     virtual const T &get_value() const
     {
 #ifdef DEBUG
@@ -36,83 +39,129 @@ public:
         return this->p_current;
     }
 
-    virtual bool operator!=(const Iterator<T> &other) const
+    virtual bool operator!=(const Iterator<T, K> &other) const
     {
         return this->p_current != other.get_current();
     }
 };
 
-template <typename T>
-class PreOrderIterator : public Iterator<T>
+template <typename T, int K>
+class PreOrderIterator : public Iterator<T, K>
 {
 private:
     stack<Node<T> *> pre_order_stack;
+    queue<Node<T> *> dfs_stack;
 
-public:
-    PreOrderIterator(Node<T> *root) : Iterator<T>(root)
+    void DFSaddSubTree(Node<T> *sub_root)
     {
-        if (root != nullptr)
-            pre_order_stack.push(root);
-    }
+#ifdef DEBUG
+        std::cout << "Adding the subtree of: " << sub_root->get_data() << std::endl;
+#endif
 
-    PreOrderIterator<T> *operator++() override
-    {
-        if (!pre_order_stack.empty())
+        this->dfs_stack.push(sub_root);
+        if (sub_root->is_leaf()) // If is leaf, was already been added on previous iteration
         {
-#ifdef DEBUG
-            std::cout << "Stack is not empty" << std::endl;
-            std::cout << "Stack size: " << pre_order_stack.size() << std::endl;
-
-#endif
-            Node<T> *current(pre_order_stack.top());
-            pre_order_stack.pop();
-#ifdef DEBUG
-            std::cout << "Popped the stack" << std::endl;
-            std::cout << "Stack size: " << pre_order_stack.size() << std::endl;
-#endif
-            if (!current->is_leaf() && current != nullptr)
-            {
-#ifdef DEBUG
-                std::cout << "Size of children vector: " << current->get_num_of_childs() << std::endl;
-                std::cout << "Trying the for loop" << std::endl;
-#endif
-                size_t i = current->get_num_of_childs();
-                for (auto node = current->get_children().rbegin(); node != current->get_children().rend(); ++node)
-                {
-#ifdef DEBUG
-                    std::cout << "Pushing: " << current->get_children().at(i - 1)->get_data() << std::endl;
-#endif
-                    pre_order_stack.push(current->get_children().at(--i));
-                }
-            }
+            return;
         }
 
-        if (!pre_order_stack.empty()) // Checking agin in case the last node did not have childrens.
+        for (Node<T> *node : sub_root->get_children())
         {
-#ifdef DEBUG
-            std::cout << "Assigning the top, which is: " << pre_order_stack.top()->get_data() << std::endl;
-#endif
-            this->p_current = pre_order_stack.top();
+            DFSaddSubTree(node);
+        }
+    }
+
+public:
+    PreOrderIterator(Node<T> *root) : Iterator<T, K>(root)
+    {
+        if (root != nullptr)
+        {
+            if (this->not_binary) // Run DFS
+            {
+                DFSaddSubTree(root);
+                this->p_current = this->dfs_stack.front();
+                this->dfs_stack.pop();
+            }
+            else
+            {
+                pre_order_stack.push(root);
+            }
+        }
+    }
+
+    PreOrderIterator<T, K> *operator++() override
+    {
+        if (this->not_binary)
+        {
+            if (this->dfs_stack.empty())
+            {
+                this->p_current = nullptr;
+                return this;
+            }
+
+            this->p_current = dfs_stack.front();
+            this->dfs_stack.pop();
+            return this;
         }
         else
         {
+            if (!pre_order_stack.empty())
+            {
 #ifdef DEBUG
-            std::cout << "Assigning nullptr" << std::endl;
+                std::cout << "Stack is not empty" << std::endl;
+                std::cout << "Stack size: " << pre_order_stack.size() << std::endl;
+
 #endif
-            this->p_current = nullptr;
+                Node<T> *current(pre_order_stack.top());
+                pre_order_stack.pop();
+#ifdef DEBUG
+                std::cout << "Popped the stack" << std::endl;
+                std::cout << "Stack size: " << pre_order_stack.size() << std::endl;
+#endif
+                if (!current->is_leaf() && current != nullptr)
+                {
+#ifdef DEBUG
+                    std::cout << "Size of children vector: " << current->get_num_of_childs() << std::endl;
+                    std::cout << "Trying the for loop" << std::endl;
+#endif
+                    size_t i = current->get_num_of_childs();
+                    for (auto node = current->get_children().rbegin(); node != current->get_children().rend(); ++node)
+                    {
+#ifdef DEBUG
+                        std::cout << "Pushing: " << current->get_children().at(i - 1)->get_data() << std::endl;
+#endif
+                        pre_order_stack.push(current->get_children().at(--i));
+                    }
+                }
+            }
+
+            if (!pre_order_stack.empty()) // Checking agin in case the last node did not have childrens.
+            {
+#ifdef DEBUG
+                std::cout << "Assigning the top, which is: " << pre_order_stack.top()->get_data() << std::endl;
+#endif
+                this->p_current = pre_order_stack.top();
+            }
+            else
+            {
+#ifdef DEBUG
+                std::cout << "Assigning nullptr" << std::endl;
+#endif
+                this->p_current = nullptr;
+            }
+#ifdef DEBUG
+            std::cout << "Done here" << std::endl;
+#endif
+            return this;
         }
-#ifdef DEBUG
-        std::cout << "Done here" << std::endl;
-#endif
-        return this;
     }
 };
 
-template <typename T>
-class PostOrderIterator : public Iterator<T>
+template <typename T, int K>
+class PostOrderIterator : public Iterator<T, K>
 {
 private:
     stack<Node<T> *> parents_stack;
+    queue<Node<T> *> dfs_queue;
 
     void addSubTree(Node<T> *sub_root)
     {
@@ -138,8 +187,26 @@ private:
         addSubTree(l_node);
     }
 
+    void DFSaddSubTree(Node<T> *sub_root)
+    {
+#ifdef DEBUG
+        std::cout << "DFS - Adding the subtree of: " << sub_root->get_data() << std::endl;
+#endif
+
+        this->dfs_queue.push(sub_root);
+        if (sub_root->is_leaf()) // If is leaf, was already been added on previous iteration
+        {
+            return;
+        }
+
+        for (Node<T> *node : sub_root->get_children())
+        {
+            DFSaddSubTree(node);
+        }
+    }
+
 public:
-    PostOrderIterator(Node<T> *root) : Iterator<T>(root)
+    PostOrderIterator(Node<T> *root) : Iterator<T, K>(root)
     {
 #ifdef DEBUG
         if (root == nullptr)
@@ -147,51 +214,80 @@ public:
 #endif
         if (root != nullptr)
         {
-            this->parents_stack.push(root); // Root must be printed at the end, therefore is pushed first
-
-            if (root->get_num_of_childs() > 1)
+            if (this->not_binary)
             {
-                this->parents_stack.push(root->get_children()[RIGHT_CHILD]);
-                addSubTree(root->get_children()[RIGHT_CHILD]);
+#ifdef DEBUG
+                std::cout << "Not binary" << std::endl;
+#endif
+                DFSaddSubTree(root);
+                this->p_current = this->dfs_queue.front();
+                this->dfs_queue.pop();
             }
-
-            if (!root->is_leaf())
+            else
             {
-                this->parents_stack.push(root->get_children()[LEFT_CHILD]);
-                addSubTree(root->get_children()[LEFT_CHILD]);
-            }
+                this->parents_stack.push(root); // Root must be printed at the end, therefore is pushed first
 
-            this->p_current = this->parents_stack.top(); // Setting the pointer to the top of the stack (which is the leftmost leaf)
-            this->parents_stack.pop();
+                if (root->get_num_of_childs() > 1)
+                {
+                    this->parents_stack.push(root->get_children()[RIGHT_CHILD]);
+                    addSubTree(root->get_children()[RIGHT_CHILD]);
+                }
+
+                if (!root->is_leaf())
+                {
+                    this->parents_stack.push(root->get_children()[LEFT_CHILD]);
+                    addSubTree(root->get_children()[LEFT_CHILD]);
+                }
+
+                this->p_current = this->parents_stack.top(); // Setting the pointer to the top of the stack (which is the leftmost leaf)
+                this->parents_stack.pop();
+            }
         }
     }
 
-    PostOrderIterator<T> *operator++() override
+    PostOrderIterator<T, K> *operator++() override
     {
-        if (parents_stack.empty()) // Means that all nodes reached, can finish.
+        if (this->not_binary)
         {
-            this->p_current = nullptr;
-#ifdef DEBUG
-            std::cout << "Parent stack is empty" << std::endl;
-#endif
+            if (dfs_queue.empty())
+            {
+                this->p_current = nullptr;
+                return this;
+            }
+
+            this->p_current = dfs_queue.front();
+            dfs_queue.pop();
             return this;
         }
-
-        if (!parents_stack.empty())
+        else
         {
-            this->p_current = parents_stack.top();
-            parents_stack.pop();
-        }
+            if (parents_stack.empty()) // Means that all nodes reached, can finish.
+            {
+                this->p_current = nullptr;
+#ifdef DEBUG
+                std::cout << "Parent stack is empty" << std::endl;
+#endif
+                return this;
+            }
 
-        return this;
+            if (!parents_stack.empty())
+            {
+                this->p_current = parents_stack.top();
+                parents_stack.pop();
+            }
+
+            return this;
+        }
     }
 };
 
-template <typename T>
-class InOrderIterator : public Iterator<T>
+template <typename T, int K>
+class InOrderIterator : public Iterator<T, K>
 {
 private:
     stack<Node<T> *> parents_stack;
+    queue<Node<T> *> dfs_stack;
+
     void addSubTree(Node<T> *sub_root)
     {
 #ifdef DEBUG
@@ -218,63 +314,105 @@ private:
         addSubTree(l_node);
     }
 
+    void DFSaddSubTree(Node<T> *sub_root)
+    {
+#ifdef DEBUG
+        std::cout << "Adding the subtree of: " << sub_root->get_data() << std::endl;
+#endif
+
+        this->dfs_stack.push(sub_root);
+        if (sub_root->is_leaf()) // If is leaf, was already been added on previous iteration
+        {
+            return;
+        }
+
+        for (Node<T> *node : sub_root->get_children())
+        {
+            DFSaddSubTree(node);
+        }
+    }
+
 public:
-    InOrderIterator(Node<T> *root) : Iterator<T>(root)
+    InOrderIterator(Node<T> *root) : Iterator<T, K>(root)
     {
         if (root != nullptr)
         {
-            if (root->get_num_of_childs() > 1)
+            if (this->not_binary)
             {
-                addSubTree(root->get_children()[RIGHT_CHILD]);
+                DFSaddSubTree(root);
+                this->p_current = this->dfs_stack.front();
+                this->dfs_stack.pop();
             }
-
-            this->parents_stack.push(root);
-
-            if (!root->is_leaf())
+            else
             {
-                addSubTree(root->get_children()[LEFT_CHILD]);
-            }
+                if (root->get_num_of_childs() > 1)
+                {
+                    addSubTree(root->get_children()[RIGHT_CHILD]);
+                }
 
-            this->p_current = this->parents_stack.top();
-            this->parents_stack.pop();
+                this->parents_stack.push(root);
+
+                if (!root->is_leaf())
+                {
+                    addSubTree(root->get_children()[LEFT_CHILD]);
+                }
+
+                this->p_current = this->parents_stack.top();
+                this->parents_stack.pop();
+            }
         }
     }
 
-    InOrderIterator<T> *operator++() override
+    InOrderIterator<T, K> *operator++() override
     {
-        if (parents_stack.empty()) // Means that all nodes reached, can finish.
+        if (this->not_binary)
         {
-            this->p_current = nullptr;
-#ifdef DEBUG
-            std::cout << "Parent stack is empty" << std::endl;
-#endif
+            if (this->dfs_stack.empty())
+            {
+                this->p_current = nullptr;
+                return this;
+            }
+
+            this->p_current = dfs_stack.front();
+            this->dfs_stack.pop();
             return this;
         }
-
-        if (!parents_stack.empty())
+        else
         {
-            this->p_current = parents_stack.top();
-            parents_stack.pop();
-        }
+            if (parents_stack.empty()) // Means that all nodes reached, can finish.
+            {
+                this->p_current = nullptr;
+#ifdef DEBUG
+                std::cout << "Parent stack is empty" << std::endl;
+#endif
+                return this;
+            }
 
-        return this;
+            if (!parents_stack.empty())
+            {
+                this->p_current = parents_stack.top();
+                parents_stack.pop();
+            }
+
+            return this;
+        }
     }
 };
 
-template <typename T>
-class BFSIterator : public Iterator<T>
+template <typename T, int K>
+class BFSIterator : public Iterator<T, K>
 {
 private:
     queue<Node<T> *> _queue;
 
 public:
-    BFSIterator(Node<T> *root) : Iterator<T>(root)
+    BFSIterator(Node<T> *root) : Iterator<T, K>(root)
     {
         if (root != nullptr)
             _queue.push(root);
     }
 
-    BFSIterator<T> *operator++() override
+    BFSIterator<T, K> *operator++() override
     {
         if (!_queue.empty())
         {
@@ -307,8 +445,8 @@ public:
     }
 };
 
-template <typename T>
-class DFSIterator : public Iterator<T>
+template <typename T, int K>
+class DFSIterator : public Iterator<T, K>
 {
 private:
     queue<Node<T> *> parents_stack;
@@ -332,7 +470,7 @@ private:
     }
 
 public:
-    DFSIterator(Node<T> *root) : Iterator<T>(root)
+    DFSIterator(Node<T> *root) : Iterator<T, K>(root)
     {
         if (root != nullptr)
         {
@@ -345,7 +483,7 @@ public:
         }
     }
 
-    DFSIterator<T> *operator++() override
+    DFSIterator<T, K> *operator++() override
     {
         if (parents_stack.empty())
         {
@@ -364,16 +502,26 @@ struct CompareNodes
 {
     bool operator()(const Node<T> *node1, const Node<T> *node2)
     {
-        return node1->get_data() > node2->get_data();
+        return node1->get_data() < node2->get_data();
     }
 };
 
 template <typename T>
-class MinHeap : public Iterator<T>
+class MinHeap : public Iterator<T, 2>
 {
 private:
-    Node<T> *min;
-    priority_queue<Node<T> *, vector<Node<T> *>, CompareNodes<T>> pq;
+    vector<Node<T> *> min_heap;
+
+    static bool compare_nodes(const Node<T> *node1, const Node<T> *node2)
+    {
+        return node1->get_data() > node2->get_data();
+    }
+
+    // void add_to_heap(Node<T> *node)
+    // {
+    //     this->min_heap.push_back(node);
+    //     std::push_heap(this->min_heap.begin(), this->min_heap.end(), compare_nodes); // Restore the heap property
+    // };
 
     void addSubTree(Node<T> *sub_root)
     {
@@ -381,8 +529,8 @@ private:
         std::cout << "Adding the subtree of: " << sub_root->get_data() << std::endl;
 #endif
 
-        this->pq.push(sub_root);
-        if (sub_root->is_leaf()) // If is leaf, was already been added on previous iteration
+        this->min_heap.push_back(sub_root);
+        if (sub_root->is_leaf()) // If it is leaf, was already been added in previous iteration
         {
             return;
         }
@@ -390,29 +538,43 @@ private:
         for (Node<T> *node : sub_root->get_children())
         {
             addSubTree(node);
-            this->p_current = pq.top();
-            pq.pop();
         }
     }
 
 public:
-    MinHeap(Node<T> *root) : Iterator<T>(root)
+    MinHeap(Node<T> *root) : Iterator<T, 2>(root)
     {
-        addSubTree(root);
-        this->p_current = pq.top();
-        pq.pop();
+        if (root != nullptr)
+        {
+            addSubTree(root);
+            std::make_heap(min_heap.begin(), min_heap.end(), compare_nodes);
+            this->p_current = min_heap.front();
+            #ifdef DEBUG
+            std::cout << "Root:" << this->p_current->get_data() <<std::endl;
+            #endif
+
+            std::pop_heap(min_heap.begin(), min_heap.end(), compare_nodes);
+            min_heap.pop_back();
+        }
     }
 
     MinHeap<T> *operator++() override
     {
-        if (pq.empty())
+#ifdef DEBUG
+        std::cout << "Iterating" << std::endl;
+#endif
+        if (min_heap.empty())
         {
             this->p_current = nullptr;
             return this;
         }
 
-        this->p_current = pq.top();
-        pq.pop();
+        this->p_current = min_heap.front();
+        std::pop_heap(min_heap.begin(), min_heap.end(), compare_nodes);
+        min_heap.pop_back();
+#ifdef DEBUG
+        std::cout << "Popped " << this->p_current->get_data() << std::endl;
+#endif
         return this;
     }
 };

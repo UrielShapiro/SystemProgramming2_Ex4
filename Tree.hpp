@@ -4,7 +4,7 @@
 #include "Node.hpp"
 #include "Iterators.hpp"
 
-//  #define DEBUG
+// #define DEBUG
 #define ERROR_MESSEGE "Error: Can pre-order traverse only on 2-ary trees"
 
 template <typename T, int K = 2>
@@ -24,117 +24,87 @@ public:
 
     void add_sub_node(Node<T> &parent, Node<T> &child)
     {
-        if (parent.get_num_of_childs() > k_ary)
+        if (parent.get_num_of_childs() > this->k_ary)
             throw std::runtime_error("ERROR: Too many children to this node");
 
         parent.add_child(child);
     }
 
-    PreOrderIterator<T> begin_pre_order()
+    PreOrderIterator<T, K> begin_pre_order()
     {
-        if (k_ary == 2)
-        {
 #ifdef DEBUG
-            std::cout << "Creating a new PreOrderIterator with the root" << std::endl;
+        std::cout << "Creating a new PreOrderIterator with the root" << std::endl;
 #endif
-            return PreOrderIterator<T>(root);
-        }
-
-        throw std::runtime_error(ERROR_MESSEGE);
+        return PreOrderIterator<T, K>(root);
     }
 
-    PreOrderIterator<T> end_pre_order()
+    PreOrderIterator<T, K> end_pre_order()
     {
-        if (k_ary == 2)
-        {
 #ifdef DEBUG
-            std::cout << "Creating a new PreOrderIterator with nullptr" << std::endl;
+        std::cout << "Creating a new PreOrderIterator with nullptr" << std::endl;
 #endif
-            return PreOrderIterator<T>(nullptr);
-        }
-
-        throw std::runtime_error(ERROR_MESSEGE);
+        return PreOrderIterator<T, K>(nullptr);
     }
 
-    PostOrderIterator<T> begin_post_order()
+    PostOrderIterator<T, K> begin_post_order()
     {
-        if (k_ary == 2)
-        {
 #ifdef DEBUG
-            std::cout << "Creating a new PostOrderIterator with the root" << std::endl;
+        std::cout << "Creating a new PostOrderIterator with the root" << std::endl;
 #endif
-            return PostOrderIterator<T>(root);
-        }
-
-        throw std::runtime_error(ERROR_MESSEGE);
+        return PostOrderIterator<T, K>(root);
     }
 
-    PostOrderIterator<T> end_post_order()
+    PostOrderIterator<T, K> end_post_order()
     {
-        if (k_ary == 2)
-        {
 #ifdef DEBUG
-            std::cout << "Creating a new PostOrderIterator with nullptr" << std::endl;
+        std::cout << "Creating a new PostOrderIterator with nullptr" << std::endl;
 #endif
-            return PostOrderIterator<T>(nullptr);
-        }
-
-        throw std::runtime_error(ERROR_MESSEGE);
+        return PostOrderIterator<T, K>(nullptr);
     }
 
-    InOrderIterator<T> begin_in_order()
+    InOrderIterator<T, K> begin_in_order()
     {
-        if (k_ary == 2)
-        {
-#ifdef DEBUG
-            std::cout << "Creating a new PostOrderIterator with nullptr" << std::endl;
-#endif
-            return InOrderIterator<T>(root);
-        }
-
-        throw std::runtime_error(ERROR_MESSEGE);
+        return InOrderIterator<T, K>(root);
     }
 
-    InOrderIterator<T> end_in_order()
+    InOrderIterator<T, K> end_in_order()
     {
-        if (k_ary == 2)
-        {
-#ifdef DEBUG
-            std::cout << "Creating a new PostOrderIterator with nullptr" << std::endl;
-#endif
-            return InOrderIterator<T>(nullptr);
-        }
-
-        throw std::runtime_error(ERROR_MESSEGE);
+        return InOrderIterator<T, K>(nullptr);
     }
 
-    BFSIterator<T> begin_bfs_scan()
+    BFSIterator<T, K> begin_bfs_scan()
     {
-        return BFSIterator<T>(root);
+        return BFSIterator<T, K>(root);
     }
 
-    BFSIterator<T> end_bfs_scan()
+    BFSIterator<T, K> end_bfs_scan()
     {
-        return BFSIterator<T>(nullptr);
+        return BFSIterator<T, K>(nullptr);
     }
 
-    DFSIterator<T> begin_dfs_scan()
+    DFSIterator<T, K> begin_dfs_scan()
     {
-        return DFSIterator<T>(root);
+        return DFSIterator<T, K>(root);
     }
 
-    DFSIterator<T> end_dfs_scan()
+    DFSIterator<T, K> end_dfs_scan()
     {
-        return DFSIterator<T>(nullptr);
+        return DFSIterator<T, K>(nullptr);
     }
 
     MinHeap<T> begin_min_heap_scan()
     {
+        if(this->k_ary > 2)
+            throw std::runtime_error(ERROR_MESSEGE);
+
         return MinHeap<T>(root);
     }
 
     MinHeap<T> end_min_heap_scan()
     {
+        if(this->k_ary > 2)
+            throw std::runtime_error(ERROR_MESSEGE);
+            
         return MinHeap<T>(nullptr);
     }
 };
