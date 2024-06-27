@@ -13,7 +13,7 @@
 // #define DEBUG
 #define ERROR_MESSEGE "Error: Can pre-order traverse only on 2-ary trees"
 
-using std::to_string, std::ostringstream, std::string;
+using std::to_string, std::ostringstream, std::string, std::vector;
 
 template <typename T, int K = 2>
 class Tree
@@ -21,6 +21,7 @@ class Tree
 private:
     size_t k_ary;
     Node<T> *root;
+    vector<T> node_values;
 
 public:
     Tree() : k_ary(K), root(nullptr){};
@@ -28,14 +29,27 @@ public:
     void add_root(Node<T> &_root)
     {
         this->root != nullptr ? throw std::runtime_error("ERROR: This tree already has a root") : this->root = &_root;
+        node_values.push_back(_root.get_data());
     }
 
     void add_sub_node(Node<T> &parent, Node<T> &child)
     {
-        if (parent.get_num_of_childs() > this->k_ary)
+        if (parent.get_num_of_childs() + 1 > this->k_ary) // + 1 for the new child
             throw std::runtime_error("ERROR: Too many children to this node");
+#ifdef DEBUG
+        std::cout << "Searching for: " << child.get_data() << " in the tree" << std::endl;
+#endif
+
+        if (std::find(node_values.begin(), node_values.end(), child.get_data()) != node_values.end())
+            throw std::runtime_error("ERROR: This node is already in the tree - can't have a cycle in the tree");
 
         parent.add_child(child);
+        node_values.push_back(child.get_data());
+    }
+
+    Node<T> *get_root() const // Is used for tests
+    {
+        return this->root;
     }
 
     PreOrderIterator<T, K> begin_pre_order()
@@ -184,7 +198,7 @@ public:
                 {
                     text.setString(node->get_data());
                 }
-                else if constexpr (std::is_same<T, Complex>::value)
+                else if constexpr (std::is_same<T, Complex<T>>::value)
                 {
                     ostringstream oss;
                     oss << node->get_data();
