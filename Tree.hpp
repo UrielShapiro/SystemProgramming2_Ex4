@@ -130,6 +130,16 @@ public:
         return MinHeap<T>(nullptr);
     }
 
+    BFSIterator<T, K> begin()
+    {
+        return begin_bfs_scan();
+    }
+
+    BFSIterator<T, K> end()
+    {
+        return end_bfs_scan();
+    }
+
     friend std::ostream &operator<<(std::ostream &os, const Tree &tree)
     {
         if (tree.root == nullptr)
@@ -208,7 +218,7 @@ public:
                 {
 
                     std::ostringstream oss;
-                    oss << std::fixed << std::setprecision(2) << node->get_data();
+                    oss << std::fixed << std::setprecision(1) << node->get_data();
                     text.setString(oss.str());
                 }
                 text.setCharacterSize(16); // Slightly larger text size

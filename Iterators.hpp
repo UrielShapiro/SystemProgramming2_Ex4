@@ -43,6 +43,11 @@ public:
     {
         return this->p_current != other.get_current();
     }
+
+    Iterator<T, K> *operator*()
+    {
+        return this;
+    }
 };
 
 template <typename T, int K>
@@ -543,9 +548,9 @@ public:
             addSubTree(root);
             std::make_heap(min_heap.begin(), min_heap.end(), compare_nodes);
             this->p_current = min_heap.front();
-            #ifdef DEBUG
-            std::cout << "Root:" << this->p_current->get_data() <<std::endl;
-            #endif
+#ifdef DEBUG
+            std::cout << "Root:" << this->p_current->get_data() << std::endl;
+#endif
 
             std::pop_heap(min_heap.begin(), min_heap.end(), compare_nodes);
             min_heap.pop_back();
