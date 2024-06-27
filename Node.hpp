@@ -3,6 +3,7 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "Complex.hpp"
 
 using std::vector;
 
@@ -16,6 +17,7 @@ private:
 public:
     Node(T data) : data(data), children{} {};
     Node(const Node<T> &other) : data(other.get_data()), children(other.get_children()) {}
+    Node(const Complex<T> &other) : data(other), children{} {}
 
     void add_child(Node<T> &child)
     {
