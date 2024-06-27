@@ -44,19 +44,20 @@ public:
         return this->children.empty();
     }
 
+    // If non-comperable type is used, there would be a compilation time error
     bool operator<(const Node<T> &other) const
     {
-        return this->data() < other.get_data();
+        return this->get_data() < other.get_data();
     }
 
     bool operator>(const Node<T> &other) const
     {
-        return this->data() > other.get_data();
+        return this->get_data() > other.get_data();
     }
 
     bool operator==(const Node<T> &other) const
     {
-        return this->data == other.get_data();
+        return this->get_data() == other.get_data();
     }
 
 };
