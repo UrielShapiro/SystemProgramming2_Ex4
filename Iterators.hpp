@@ -1,3 +1,8 @@
+/**
+ * Name: Uriel Shapiro
+ * ID: 9745
+ */
+
 #pragma once
 #include "Node.hpp"
 #include <stack>
