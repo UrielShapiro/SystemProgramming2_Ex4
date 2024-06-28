@@ -3,7 +3,8 @@
  * ID: 9745
  */
 
-#pragma once
+#ifndef NODE_HPP
+#define NODE_HPP
 #include <vector>
 #include <cmath>
 #include <SFML/Graphics.hpp>
@@ -12,17 +13,23 @@
 
 using std::vector;
 
+/**
+ * @brief A class that represents a node in a k-ary tree.
+ */
 template <typename T>
 class Node
 {
 private:
-    T data;
-    vector<Node<T> *> children;
+    T data; // Data can be any type
+    vector<Node<T> *> children; // Each node has a vector of pointers to its children
 
 public:
     Node(T data) : data(data), children{} {};
     Node(const Node<T> &other) : data(other.get_data()), children(other.get_children()) {}
-    Node(const Complex<T> &other) : data(other), children{} {}
+
+    // This constructor is used to convert a Complex object to a Node object, 
+    // because we want the type of object inside the Node to be Complex.
+    Node(const Complex<T> &other) : data(other), children{} {}  
 
     void add_child(Node<T> &child)
     {
@@ -64,5 +71,5 @@ public:
     {
         return this->get_data() == other.get_data();
     }
-
 };
+#endif

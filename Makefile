@@ -3,11 +3,10 @@
 
 CXX = g++
 CXXFLAGS = -Wall -Wextra -g -Wno-comment
-GUIFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
-HEADRS = $(wildcard *.hpp)	
+GUIFLAGS = -lsfml-graphics -lsfml-window -lsfml-system 		# Flags for the GUI
+HEADRS = $(wildcard *.hpp)	# all .hpp files in the current directory
 
 Test = Test
-
 demo = Demo
 EXE = tree
 

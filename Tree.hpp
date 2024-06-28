@@ -3,14 +3,15 @@
  * ID: 9745
  */
 
-#pragma once
-#include <stddef.h>
-#include <stdexcept>
-#include <SFML/Graphics.hpp>
-#include <functional>
-#include <sstream>
+#ifndef TREE_HPP
+#define TREE_HPP
+#include <stddef.h> 
+#include <stdexcept>            // To throw exceptions
+#include <SFML/Graphics.hpp>    // For visualization
+#include <functional>           // For std::function
+#include <sstream>              // For std::ostringstream
 #include <string>
-#include <iomanip>
+#include <iomanip>              // For std::fixed, std::setprecision
 #include "Node.hpp"
 #include "Iterators.hpp"
 #include "Complex.hpp"
@@ -20,23 +21,36 @@
 
 using std::to_string, std::ostringstream, std::string, std::vector;
 
+/**
+ * @brief A class that represents a k-ary tree of template type of nodes.
+ */
 template <typename T, int K = 2>
 class Tree
 {
 private:
     size_t k_ary;
     Node<T> *root;
-    vector<T> node_values;
+    vector<T> node_values;  // To check if a node is already in the tree, is used to prevent cycles.
 
 public:
     Tree() : k_ary(K), root(nullptr){};
+    ~Tree() = default; // Nodes are not dynamically allocated, therefore they will be deleted automatically when exiting the scope
 
+    /**
+     * @brief Adds a root to the tree.
+     * If the tree already has a root, an exception will be thrown.
+     */
     void add_root(Node<T> &_root)
     {
         this->root != nullptr ? throw std::runtime_error("ERROR: This tree already has a root") : this->root = &_root;
         node_values.push_back(_root.get_data());
     }
 
+    /**
+     * @brief Adds a child to a parent node.
+     * If the parent node already has k children, an exception will be thrown.
+     * If the child is already in the tree, an exception will be thrown (No cycles allowed in a tree).
+     */
     void add_sub_node(Node<T> &parent, Node<T> &child)
     {
         if (parent.get_num_of_childs() + 1 > this->k_ary) // + 1 for the new child
@@ -45,9 +59,10 @@ public:
         std::cout << "Searching for: " << child.get_data() << " in the tree" << std::endl;
 #endif
 
-        if (std::find(node_values.begin(), node_values.end(), child.get_data()) != node_values.end())
+        if (std::find(node_values.begin(), node_values.end(), child.get_data()) != node_values.end())   // Check if the node is already in the tree
             throw std::runtime_error("ERROR: This node is already in the tree - can't have a cycle in the tree");
 
+        // If non of the exceptions were thrown, add the child to the parent
         parent.add_child(child);
         node_values.push_back(child.get_data());
     }
@@ -57,6 +72,8 @@ public:
         return this->root;
     }
 
+    // ----------------------------------- Iterators -----------------------------------
+    // The setting for each iterator is the same, and the iterators handle the input inside them, so no need to check the input here.
     PreOrderIterator<T, K> begin_pre_order()
     {
 #ifdef DEBUG
@@ -135,6 +152,7 @@ public:
         return MinHeap<T>(nullptr);
     }
 
+    // ----------------------------------- For Each Iterators -----------------------------------
     BFSIterator<T, K> begin()
     {
         return begin_bfs_scan();
@@ -145,6 +163,7 @@ public:
         return end_bfs_scan();
     }
 
+    // ----------------------------------- Visualization -----------------------------------
     friend std::ostream &operator<<(std::ostream &os, const Tree &tree)
     {
         if (tree.root == nullptr)
@@ -183,11 +202,12 @@ public:
                 }
             }
         };
-
+        // Start positioning nodes from the root
         position_nodes(tree.root, window.getSize().x / 2.f, node_radius + 50.f, initial_horizontal_spacing);
 
+        // Main window loop
         while (window.isOpen())
-        {
+        { 
             sf::Event event;
             while (window.pollEvent(event))
             {
@@ -232,7 +252,7 @@ public:
                 text.setOrigin(text_bounds.left + text_bounds.width / 2.0f, text_bounds.top + text_bounds.height / 2.0f);
                 text.setPosition(position);
                 window.draw(text);
-
+            
                 for (Node<T> *child : node->get_children())
                 {
                     if (child)
@@ -252,3 +272,4 @@ public:
         return os;
     }
 };
+#endif

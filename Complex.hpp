@@ -2,14 +2,17 @@
  * Name: Uriel Shapiro
  * ID: 9745
  */
-
-#pragma once
+#ifndef COMPLEX_HPP
+#define COMPLEX_HPP
 #include <string>
 #include <cassert>
 #include <cmath>
 
 using std::string, std::to_string;
 
+/*
+    @brief: These functions will be used to check if a parameter given to the Complex class is a numeric type
+*/
 template <typename T>
 constexpr bool is_numeric = false;
 template <>
@@ -27,14 +30,18 @@ template <typename T>
 class Complex
 {
 private:
-    // Assuming a complex number is of the form: a+bi
+    // Assuming a complex number is of the form: a + bi
     T a;
     T b;
 
 public:
+
+    /*
+        @brief: Constructor for the Complex class, will fail at compile time if T is not a numeric type
+    */
     Complex(T real, T imaginary) : a(real), b(imaginary)
     {
-        static_assert(is_numeric<T>, "T must be a numeric type"); // Will fail at compile time if T is not a numeric type
+        static_assert(is_numeric<T>, "Complex parameters must be of numeric type"); // Will fail at compile time if T is not a numeric type
     }
 
     string get_data() const
@@ -56,10 +63,12 @@ public:
     {
         return this->getReal() == other.getReal() && this->getImaginary() == other.getImaginary();
     }
+
     bool operator!=(const Complex &other) const
     {
         return !(*this == other);
     }
+
     friend bool operator>(const Complex &me, const Complex &other)
     {
         return sqrt(pow(me.getReal(), 2) + pow(me.getImaginary(), 2)) > sqrt(pow(other.getReal(), 2) + pow(other.getImaginary(), 2));
@@ -76,3 +85,4 @@ public:
         return os;
     }
 };
+#endif

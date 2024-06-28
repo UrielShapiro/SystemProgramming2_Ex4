@@ -36,7 +36,7 @@ TEST_CASE("Test Tree")
         CHECK_EQ(tree.get_root(), &root_node);
     }
 
-    SUBCASE("Test add_root - Check Errors")
+    SUBCASE("Test add_root - Adding a root to a tree that already has a root")
     {
         Node<int> root_node = Node(1);
         Tree<int, 3> tree;
@@ -70,7 +70,7 @@ TEST_CASE("Test Tree")
         CHECK_EQ(n5.get_num_of_childs(), 0);
     }
 
-    SUBCASE("Test add_sub_node - Check Errors")
+    SUBCASE("Test add_sub_node - Too many children")
     {
         Node<int> root_node2 = Node(1);
         Tree<int, 3> tree2;
@@ -86,6 +86,23 @@ TEST_CASE("Test Tree")
         tree2.add_sub_node(root_node2, n2_2);
         tree2.add_sub_node(root_node2, n3_2);
         CHECK_THROWS(tree2.add_sub_node(root_node2, n4_2)); // Too many children
+    }
+
+    SUBCASE("Test add_sub_node - Creating a Cycle")
+    {
+        Node<int> root_node2 = Node(1);
+        Tree<int, 3> tree2;
+        tree2.add_root(root_node2);
+        Node<int> n1_2 = Node(2);
+        Node<int> n2_2 = Node(3);
+        Node<int> n3_2 = Node(4);
+        Node<int> n4_2 = Node(5);
+        Node<int> n5_2 = Node(6);
+        Node<int> n6_2 = Node(7);
+
+        tree2.add_sub_node(root_node2, n1_2);
+        tree2.add_sub_node(root_node2, n2_2);
+        tree2.add_sub_node(root_node2, n3_2);
         tree2.add_sub_node(n1_2, n5_2);
         tree2.add_sub_node(n1_2, n6_2);
         CHECK_THROWS(tree2.add_sub_node(n1_2, n3_2)); // Creating a cycle
