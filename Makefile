@@ -2,7 +2,7 @@
  # ID: 9745
 
 CXX = g++
-CXXFLAGS = -Wall -Wextra -g -Wno-comment
+CXXFLAGS = -Wall -Wextra -g 
 GUIFLAGS = -lsfml-graphics -lsfml-window -lsfml-system 		# Flags for the GUI
 HEADRS = $(wildcard *.hpp)	# all .hpp files in the current directory
 
