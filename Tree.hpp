@@ -24,7 +24,7 @@ using std::to_string, std::ostringstream, std::string, std::vector;
 /**
  * @brief A class that represents a k-ary tree of template type of nodes.
  */
-template <typename T, int K = 2>
+template <typename T, int K = BINARY_TREE>
 class Tree
 {
 private:
