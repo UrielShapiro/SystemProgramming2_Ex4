@@ -7,8 +7,18 @@
 #include <string>
 #include <cassert>
 #include <cmath>
+#include <iomanip>              // For std::fixed, std::setprecision
 
-using std::string, std::to_string;
+
+using std::string;
+
+template <typename T>
+string formatValue(T value)
+{
+    std::ostringstream out;
+    out << std::fixed << std::setprecision(1) << value;
+    return out.str();
+}
 
 /*
     @brief: These functions will be used to check if a parameter given to the Complex class is a numeric type
@@ -46,7 +56,7 @@ public:
 
     string get_data() const
     {
-        return to_string(this->a) + " + " + to_string(this->b) + "i";
+        return formatValue(this->a) + " + " + formatValue(this->b) + "i";
     }
 
     T getReal() const
