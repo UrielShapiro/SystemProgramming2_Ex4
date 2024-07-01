@@ -30,7 +30,7 @@ protected:
     bool not_binary;
 
 public:
-    Iterator(Node<T> *root) : p_current(root), not_binary(K > 2) {}
+    Iterator(Node<T> *root = nullptr) : p_current(root), not_binary(K > 2) {}
     virtual ~Iterator() = default;            // Nothing is dynamically allocated.
     virtual Iterator<T, K> *operator++() = 0; // Each iterator has to implement this function.
     virtual const T &get_value() const
@@ -52,6 +52,11 @@ public:
     virtual bool operator!=(const Iterator<T, K> &other) const
     {
         return this->p_current != other.get_current();
+    }
+
+    virtual bool operator==(const Iterator<T, K> &other) const
+    {
+        return this->p_current == other.get_current();
     }
 
     Iterator<T, K> *operator*()
