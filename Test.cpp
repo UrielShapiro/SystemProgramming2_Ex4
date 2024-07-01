@@ -6,14 +6,13 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
 #include "Tree.hpp"
-#include <unistd.h>
+#include <iomanip> // For std::fixed, std::setprecision
 #include <string>
-#include <random>
 
 using std::string;
 
 template <typename T>
-std::string formatNumbers(T value)
+string formatNumbers(T value)
 {
     std::ostringstream out;
     out << std::fixed << std::setprecision(1) << value;
@@ -107,6 +106,12 @@ TEST_CASE("Test Tree")
         tree2.add_sub_node(n1_2, n6_2);
         CHECK_THROWS(tree2.add_sub_node(n1_2, n3_2)); // Creating a cycle
     }
+
+    SUBCASE("Test Empty Tree")
+    {
+        Tree<int> tree;
+        CHECK_EQ(tree.get_root(), nullptr);
+    }
 }
 
 TEST_CASE("Test Iterators On Binary trees")
@@ -183,6 +188,8 @@ TEST_CASE("Test Iterators On Binary trees")
      *  "1.4"  "1.5"  "1.6"
      */
 
+    Tree<int> empty_tree;
+
     SUBCASE("Test Pre Order")
     {
         double pre_order[] = {1.1, 1.2, 1.4, 1.5, 1.3, 1.6};
@@ -205,6 +212,8 @@ TEST_CASE("Test Iterators On Binary trees")
         {
             CHECK_EQ(node.get_value(), formatNumbers(pre_order[pre_order_index++]));
         }
+
+        CHECK_EQ(empty_tree.begin_pre_order(), empty_tree.end_pre_order());
     }
 
     SUBCASE("Test Post Order")
@@ -229,6 +238,8 @@ TEST_CASE("Test Iterators On Binary trees")
         {
             CHECK_EQ(node.get_value(), formatNumbers(post_order[post_order_index++]));
         }
+
+        CHECK_EQ(empty_tree.begin_post_order(), empty_tree.end_post_order());
     }
 
     SUBCASE("Test In Order")
@@ -253,6 +264,8 @@ TEST_CASE("Test Iterators On Binary trees")
         {
             CHECK_EQ(node.get_value(), formatNumbers(in_order[in_order_index++]));
         }
+
+        CHECK_EQ(empty_tree.begin_in_order(), empty_tree.end_in_order());
     }
 
     SUBCASE("Test DFS")
@@ -277,6 +290,8 @@ TEST_CASE("Test Iterators On Binary trees")
         {
             CHECK_EQ(node.get_value(), formatNumbers(dfs[dfs_index++]));
         }
+
+        CHECK_EQ(empty_tree.begin_dfs_scan(), empty_tree.end_dfs_scan());
     }
 
     SUBCASE("Test BFS")
@@ -301,6 +316,8 @@ TEST_CASE("Test Iterators On Binary trees")
         {
             CHECK_EQ(node.get_value(), formatNumbers(bfs[bfs_index++]));
         }
+
+        CHECK_EQ(empty_tree.begin_bfs_scan(), empty_tree.end_bfs_scan());
     }
 
     SUBCASE("Test MinHeap")
@@ -325,6 +342,8 @@ TEST_CASE("Test Iterators On Binary trees")
         {
             CHECK_EQ(node.get_value(), formatNumbers(min_heap[min_heap_index++]));
         }
+
+        CHECK_EQ(empty_tree.begin_min_heap_scan(), empty_tree.end_min_heap_scan());
     }
 };
 
@@ -408,6 +427,8 @@ TEST_CASE("Test Iterators on Non-Binary Trees")
      *  "5"    "6"  "7"
      */
 
+    Tree<int, 6> empty_tree;
+
     // All Binary Itrators should return DFS scan
     SUBCASE("Test Pre Order")
     {
@@ -431,6 +452,8 @@ TEST_CASE("Test Iterators on Non-Binary Trees")
         {
             CHECK_EQ(node.get_value(), formatNumbers(pre_order[pre_order_index++]));
         }
+
+        CHECK_EQ(empty_tree.begin_pre_order(), empty_tree.end_pre_order());
     }
 
     SUBCASE("Test Post Order")
@@ -455,6 +478,8 @@ TEST_CASE("Test Iterators on Non-Binary Trees")
         {
             CHECK_EQ(node.get_value(), formatNumbers(post_order[post_order_index++]));
         }
+
+        CHECK_EQ(empty_tree.begin_post_order(), empty_tree.end_post_order());
     }
 
     SUBCASE("Test In Order")
@@ -479,6 +504,8 @@ TEST_CASE("Test Iterators on Non-Binary Trees")
         {
             CHECK_EQ(node.get_value(), formatNumbers(in_order[in_order_index++]));
         }
+
+        CHECK_EQ(empty_tree.begin_in_order(), empty_tree.end_in_order());
     }
 
     SUBCASE("Test DFS")
@@ -503,6 +530,8 @@ TEST_CASE("Test Iterators on Non-Binary Trees")
         {
             CHECK_EQ(node.get_value(), formatNumbers(dfs[dfs_index++]));
         }
+
+        CHECK_EQ(empty_tree.begin_dfs_scan(), empty_tree.end_dfs_scan());
     }
 
     SUBCASE("Test BFS")
@@ -527,6 +556,8 @@ TEST_CASE("Test Iterators on Non-Binary Trees")
         {
             CHECK_EQ(node.get_value(), formatNumbers(bfs[bfs_index++]));
         }
+
+        CHECK_EQ(empty_tree.begin_bfs_scan(), empty_tree.end_bfs_scan());
     }
 
     SUBCASE("Test MinHeap") // Min  heap should not work on non binary trees
@@ -537,6 +568,8 @@ TEST_CASE("Test Iterators on Non-Binary Trees")
         CHECK_THROWS(tree.end_min_heap_scan());
         CHECK_THROWS(tree_complex.end_min_heap_scan());
         CHECK_THROWS(tree_string.end_min_heap_scan());
+        CHECK_THROWS(empty_tree.begin_min_heap_scan());
+        CHECK_THROWS(empty_tree.end_min_heap_scan());
     }
 }
 
@@ -821,10 +854,10 @@ TEST_CASE("Test Complex")
         CHECK_EQ(c1.get_data(), "1 + 2i");
 
         Complex<double> c2(1.1, 2.2);
-        CHECK_EQ(c2.get_data(), "1.100000 + 2.200000i");
+        CHECK_EQ(c2.get_data(), "1.1 + 2.2i");
 
         Complex<float> c3(1.1, 2.2);
-        CHECK_EQ(c3.get_data(), "1.100000 + 2.200000i");
+        CHECK_EQ(c3.get_data(), "1.1 + 2.2i");
 
         Complex<long> c4(1, 2);
         CHECK_EQ(c4.get_data(), "1 + 2i");
@@ -1063,12 +1096,12 @@ TEST_CASE("Test Complex")
         Complex<double> c2(1.1, 2.2);
         std::ostringstream oss2;
         oss2 << c2;
-        CHECK_EQ(oss2.str(), "1.100000 + 2.200000i");
+        CHECK_EQ(oss2.str(), "1.1 + 2.2i");
 
         Complex<float> c3(1.1, 2.2);
         std::ostringstream oss3;
         oss3 << c3;
-        CHECK_EQ(oss3.str(), "1.100000 + 2.200000i");
+        CHECK_EQ(oss3.str(), "1.1 + 2.2i");
 
         Complex<long> c4(1, 2);
         std::ostringstream oss4;
