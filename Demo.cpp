@@ -38,49 +38,55 @@ int main()
     cout << "Pre Order Traversal: " << endl;
     for (auto node = tree.begin_pre_order(); node != tree.end_pre_order(); ++node)
     {
-        cout << node.get_value() << endl;
+        cout << node.get_value() << "\t";
     } // prints: 1.1, 1.2, 1.4, 1.5, 1.3, 1.6
     cout << endl;
 
-    cout << "Post Order Traversal: " << endl;
+    cout << endl
+         << "Post Order Traversal: " << endl;
     for (auto node = tree.begin_post_order(); node != tree.end_post_order(); ++node)
     {
-        cout << node.get_value() << endl;
+        cout << node.get_value() << "\t";
     } // prints: 1.4, 1.5, 1.2, 1.6, 1.3, 1.1
     cout << endl;
 
-    cout << "In Order Traversal: " << endl;
+    cout << endl
+         << "In Order Traversal: " << endl;
     for (auto node = tree.begin_in_order(); node != tree.end_in_order(); ++node)
     {
-        cout << node.get_value() << endl;
+        cout << node.get_value() << "\t";
     } // prints: 1.4, 1.2, 1.5, 1.1, 1.6, 1.3
     cout << endl;
 
-    cout << "BFS Scan: " << endl;
+    cout << endl
+         << "BFS Scan: " << endl;
     for (auto node = tree.begin_bfs_scan(); node != tree.end_bfs_scan(); ++node)
     {
-        cout << node.get_value() << endl;
+        cout << node.get_value() << "\t";
     } // prints: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
     cout << endl;
 
-    cout << "DFS Scan: " << endl;
+    cout << endl
+         << "DFS Scan: " << endl;
     for (auto node = tree.begin_dfs_scan(); node != tree.end_dfs_scan(); ++node)
     {
-        cout << node.get_value() << endl;
+        cout << node.get_value() << "\t";
     } // prints: 1.1, 1.2, 1.4, 1.5, 1.3, 1.6
     cout << endl;
 
-    cout << "MinHeap Traversal: " << endl;
+    cout << endl
+         << "MinHeap Traversal: " << endl;
     for (auto node = tree.begin_min_heap_scan(); node != tree.end_min_heap_scan(); ++node)
     {
-        cout << node.get_value() << endl;
+        cout << node.get_value() << "\t";
     } // prints: 1.1, 1.2, 1.4, 1.5, 1.3, 1.6
     cout << endl;
 
-    cout << "For Each Scan: " << endl;
+    cout << endl
+         << "For Each Scan: " << endl;
     for (auto node : tree)
     {
-        cout << node->get_value() << endl;
+        cout << node->get_value() << "\t";
     } // same as BFS: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
     cout << endl;
 
@@ -100,10 +106,14 @@ int main()
     tree_complex.add_sub_node(n1_complex, n4_complex);
     tree_complex.add_sub_node(n2_complex, n5_complex);
 
-    cout << "MinHeap Traversal on Complex Numbers: " << endl;
+    freopen("/dev/null", "w", stderr);
+    cout << tree_complex << endl;
+
+    cout << endl
+         << "MinHeap Traversal on Complex Numbers: " << endl;
     for (auto node = tree_complex.begin_min_heap_scan(); node != tree_complex.end_min_heap_scan(); ++node)
     {
-        cout << node.get_value() << endl;
+        cout << node.get_value() << "\t";
     } // prints: 1.1 + 1.1i, 1.2 + 1.2i, 1.3 + 1.3i, 1.4 + 1.4i, 1.5 + 1.5i, 1.6 + 1.6i
     cout << endl;
 
@@ -121,32 +131,38 @@ int main()
     three_ary_tree.add_sub_node(n11, n41);
     three_ary_tree.add_sub_node(n11, n51);
 
-    cout << "Trinary In Order Traversal: " << endl;
+    cout << endl
+         << "Trinary In Order Traversal: " << endl;
     for (auto node = three_ary_tree.begin_in_order(); node != three_ary_tree.end_in_order(); ++node)
     {
-        cout << node.get_value() << endl;
+        cout << node.get_value() << "\t";
     } // prints: 1.1, 1.2, 1.5, 1.6, 1.3, 1.4
     cout << endl;
 
-    cout << "Trinary Post Order Traversal: " << endl;
+    cout << endl
+         << "Trinary Post Order Traversal: " << endl;
     for (auto node = three_ary_tree.begin_post_order(); node != three_ary_tree.end_post_order(); ++node)
     {
-        cout << node.get_value() << endl;
+        cout << node.get_value() << "\t";
     } // prints: 1.1, 1.2, 1.5, 1.6, 1.3, 1.4
     cout << endl;
 
-    cout << "Trinary Pre Order Traversal: " << endl;
+    cout << endl
+         << "Trinary Pre Order Traversal: " << endl;
     for (auto node = three_ary_tree.begin_pre_order(); node != three_ary_tree.end_pre_order(); ++node)
     {
-        cout << node.get_value() << endl;
+        cout << node.get_value() << "\t";
     } // prints: 1.1, 1.2, 1.5, 1.6, 1.3, 1.4
     cout << endl;
 
-    cout << "Trinary BFS Scan: " << endl;
+    cout << endl
+         << "Trinary BFS Scan: " << endl;
     for (auto node = three_ary_tree.begin_bfs_scan(); node != three_ary_tree.end_bfs_scan(); ++node)
     {
-        cout << node.get_value() << endl;
+        cout << node.get_value() << "\t";
     } // prints: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
+    cout << endl;
+
     cout << endl;
 
     cout << three_ary_tree << endl;
