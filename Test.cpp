@@ -11,11 +11,16 @@
 
 using std::string;
 
+#define PRECISION 1
+
+/**
+ * @brief: This function sets the precision of (but not only) doubles and floats to PRECISION integers after the decimal dot.
+ */
 template <typename T>
 string formatNumbers(T value)
 {
     std::ostringstream out;
-    out << std::fixed << std::setprecision(1) << value;
+    out << std::fixed << std::setprecision(PRECISION) << value;
     return out.str();
 }
 
