@@ -79,6 +79,7 @@ public:
         return !(*this == other);
     }
 
+    // Check which is more distant from the origin (0,0)
     friend bool operator>(const Complex &me, const Complex &other)
     {
         return sqrt(pow(me.getReal(), 2) + pow(me.getImaginary(), 2)) > sqrt(pow(other.getReal(), 2) + pow(other.getImaginary(), 2));
