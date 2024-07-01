@@ -166,22 +166,22 @@ public:
     // ----------------------------------- Visualization -----------------------------------
     friend std::ostream &operator<<(std::ostream &os, const Tree &tree)
     {
-        if (tree.root == nullptr)
+        if (tree.root == nullptr)   // Nothing to print
             return os;
 
-        sf::RenderWindow window(sf::VideoMode(1000, 800), "Tree Visualization");
+        sf::RenderWindow window(sf::VideoMode(1000, 800), "Tree Visualization");    // Create a window
         sf::Font font;
-        if (!font.loadFromFile("arial.ttf"))
+        if (!font.loadFromFile("arial.ttf"))                                        // Load a font from a file
         {
             std::cerr << "Error loading font\n";
             return os;
         }
 
-        const float node_radius = 25.f;                 // Slightly decreased node radius
+        const float node_radius = 35.f;                 // Slightly decreased node radius
         const float vertical_spacing = 80.f;            // Reduced vertical spacing
         const float initial_horizontal_spacing = 200.f; // Reduced initial horizontal spacing
 
-        std::map<Node<T> *, sf::Vector2f> positions;
+        std::map<Node<T> *, sf::Vector2f> positions;    // This map will store the positions of each node (Node, Position)
 
         // Recursively position nodes
         std::function<void(Node<T> *, float, float, float)> position_nodes = [&](Node<T> *node, float x, float y, float horizontal_spacing)
@@ -189,19 +189,21 @@ public:
             if (node == nullptr)
                 return;
 
-            positions[node] = sf::Vector2f(x, y);
+            positions[node] = sf::Vector2f(x, y);   // Store the position of the node in the map
 
-            float child_x_offset = x - (node->get_children().size() - 1) * horizontal_spacing / 2.f;
+            float child_x_offset = x - (node->get_children().size() - 1) * horizontal_spacing / 2.f;    // Calculate the offset for the children
 
             for (size_t i = 0; i < node->get_children().size(); ++i)
             {
                 Node<T> *child = node->get_children()[i];
                 if (child != nullptr)
                 {
-                    position_nodes(child, child_x_offset + i * horizontal_spacing, y + vertical_spacing, horizontal_spacing / 2.f);
+                    // Recursively position the children
+                    position_nodes(child, child_x_offset + i * horizontal_spacing, y + vertical_spacing, horizontal_spacing / 2.f); 
                 }
             }
         };
+
         // Start positioning nodes from the root
         position_nodes(tree.root, window.getSize().x / 2.f, node_radius + 50.f, initial_horizontal_spacing);
 
@@ -209,65 +211,57 @@ public:
         while (window.isOpen())
         { 
             sf::Event event;
-            while (window.pollEvent(event))
+            while (window.pollEvent(event)) // Changes the event status
             {
-                if (event.type == sf::Event::Closed)
+                if (event.type == sf::Event::Closed)    
                     window.close();
             }
 
-            window.clear(sf::Color::White);
+            window.clear(sf::Color::White); // Each iteration, clear the window
 
-            for (const auto &pair : positions)
+            for (const auto &pair : positions)  
             {
                 Node<T> *node = pair.first;
-                sf::Vector2f position = pair.second;
+                sf::Vector2f position = pair.second;    // Get the position of the node
 
-                sf::CircleShape circle(node_radius);
-                circle.setFillColor(sf::Color::Green);
-                circle.setPosition(position - sf::Vector2f(node_radius, node_radius));
-                window.draw(circle);
+                sf::CircleShape circle(node_radius);    // Create a circle shape
+                circle.setFillColor(sf::Color::Green);  // Set the color of the circle to green
+                circle.setPosition(position - sf::Vector2f(node_radius, node_radius));  // Set the position of the circle
+                window.draw(circle);                    // Draw the circle on the window
 
                 sf::Text text;
-                text.setFont(font);
-                if constexpr (std::is_same<T, string>::value)
+                text.setFont(font);                     // Set the font of the text to write the value of the node
+                if constexpr (std::is_same<T, string>::value || std::is_same<T, Complex<T>>::value)
                 {
-                    text.setString(node->get_data());
-                }
-                else if constexpr (std::is_same<T, Complex<T>>::value)
-                {
-                    ostringstream oss;
-                    oss << node->get_data();
-                    text.setString(oss.str());
+                    text.setString(node->get_data());   // Set the string of the text to the value of the node
                 }
                 else
                 {
-
-                    std::ostringstream oss;
-                    oss << std::fixed << std::setprecision(1) << node->get_data();
-                    text.setString(oss.str());
+                    text.setString(formatValue(node->get_data()));
                 }
-                text.setCharacterSize(16); // Slightly larger text size
-                text.setFillColor(sf::Color::Black);
-                sf::FloatRect text_bounds = text.getLocalBounds();
-                text.setOrigin(text_bounds.left + text_bounds.width / 2.0f, text_bounds.top + text_bounds.height / 2.0f);
-                text.setPosition(position);
-                window.draw(text);
+                text.setCharacterSize(16); // Set the text size
+                text.setFillColor(sf::Color::Black);    // Set the color of the text
+                sf::FloatRect text_bounds = text.getLocalBounds();  // Get the bounds of the text
+                text.setOrigin(text_bounds.left + text_bounds.width / 2.0f, text_bounds.top + text_bounds.height / 2.0f);   // Set the origin of the text to be in the center
+                text.setPosition(position); // Set the position of the text to be the same as the node
+                window.draw(text);  // Draw the text on the window
             
-                for (Node<T> *child : node->get_children())
+                for (Node<T> *child : node->get_children())  // Draw lines between the nodes
                 {
                     if (child)
                     {
-                        sf::Vector2f child_position = positions[child];
-
-                        sf::Vertex line[] =
+                        sf::Vector2f child_position = positions[child]; // Get the position of the child
+                        
+                        // Create a line between the nodes
+                        sf::Vertex line[] = 
                             {
                                 sf::Vertex(position, sf::Color::Black),
                                 sf::Vertex(child_position, sf::Color::Black)};
-                        window.draw(line, 2, sf::Lines);
+                        window.draw(line, 2, sf::Lines);    // Draw the line on the window
                     }
                 }
             }
-            window.display();
+            window.display();   // Display the window each iteration
         }
         return os;
     }
