@@ -51,7 +51,7 @@ public:
      */
     virtual bool operator!=(const Iterator<T, K> &other) const
     {
-        return this->p_current != other.get_current();
+        return !(*this == other);
     }
 
     virtual bool operator==(const Iterator<T, K> &other) const
@@ -505,7 +505,7 @@ private:
      * @brief: This function will be used to add the subtree of a node to the queue in a DFS manner.
      * For each node reached, We will add it and its children to the queue.
      */
-    void addSubTree(Node<T> *sub_root) 
+    void addSubTree(Node<T> *sub_root)
     {
 #ifdef DEBUG
         std::cout << "Adding the subtree of: " << sub_root->get_data() << std::endl;
@@ -530,9 +530,9 @@ public:
 #ifdef DEBUG
             std::cout << "Creating new DFSIterator" << std::endl;
 #endif
-            addSubTree(root);   // Adding the subtree of the root in a DFS manner
-            this->p_current = this->parents_queue.front();  // The first node to be printed is the root
-            parents_queue.pop();    // Removing the current node from the queue, because it was already printed.
+            addSubTree(root);                              // Adding the subtree of the root in a DFS manner
+            this->p_current = this->parents_queue.front(); // The first node to be printed is the root
+            parents_queue.pop();                           // Removing the current node from the queue, because it was already printed.
         }
     }
 
@@ -544,7 +544,7 @@ public:
             return this;
         }
 
-        this->p_current = parents_queue.front();    // The next node to be printed is the front of the queue, becuase the queue is initialized in a DFS manner
+        this->p_current = parents_queue.front(); // The next node to be printed is the front of the queue, becuase the queue is initialized in a DFS manner
         parents_queue.pop();
         return this;
     }
@@ -552,7 +552,7 @@ public:
 
 /**
  * @brief: This class will be used to iterate over the tree in a min heap manner.
- 
+
  */
 template <typename T>
 class MinHeap : public Iterator<T, 2>
@@ -595,14 +595,14 @@ public:
         if (root != nullptr)
         {
             addSubTree(root);
-            std::make_heap(min_heap.begin(), min_heap.end(), compare_nodes);    // After initializing the vector, we will create the min heap
-            this->p_current = min_heap.front(); // The first node to be printed is the min of the heap
+            std::make_heap(min_heap.begin(), min_heap.end(), compare_nodes); // After initializing the vector, we will create the min heap
+            this->p_current = min_heap.front();                              // The first node to be printed is the min of the heap
 #ifdef DEBUG
             std::cout << "Root:" << this->p_current->get_data() << std::endl;
 #endif
 
             std::pop_heap(min_heap.begin(), min_heap.end(), compare_nodes); // Removing the min from the heap
-            min_heap.pop_back();    // Removing the min from the vector aswell
+            min_heap.pop_back();                                            // Removing the min from the vector aswell
         }
     }
 
