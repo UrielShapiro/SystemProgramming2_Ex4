@@ -53,7 +53,7 @@ public:
 
     bool is_leaf() const
     {
-        return this->children.empty();
+        return this->children.empty();  // If the node has no children -> he is leaf
     }
 
     // If non-comperable type is used, there would be a compilation time error
